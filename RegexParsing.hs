@@ -44,8 +44,7 @@ dot :: Parser StateMachines.StateMachine
 dot = Parsec.char '.' >> return StateMachines.anyChar
 
 duplication :: Parser (StateMachines.StateMachine -> StateMachines.StateMachine)
-duplication = star <|> plus <|> question <|> singleCurly <|> openCurly <|>
-              boundedCurly
+duplication = star <|> plus <|> question <|> curly
 
 star :: Parser (StateMachines.StateMachine -> StateMachines.StateMachine)
 star = Parsec.char '*' >> return StateMachines.kleene
@@ -56,29 +55,17 @@ plus = Parsec.char '+' >> return StateMachines.oneOrMore
 question :: Parser (StateMachines.StateMachine -> StateMachines.StateMachine)
 question = Parsec.char '?' >> return StateMachines.optional
 
-singleCurly :: Parser (StateMachines.StateMachine -> StateMachines.StateMachine)
-singleCurly = do
-  Parsec.char '{'
-  count <- nat
-  Parsec.char '}'
-  return $ StateMachines.repeatFixed count
-
-openCurly :: Parser (StateMachines.StateMachine -> StateMachines.StateMachine)
-openCurly = do
-  Parsec.char '{'
-  count <- nat
-  Parsec.char ','
-  Parsec.char '}'
-  return $ StateMachines.repeatAtLeast count
-
-boundedCurly :: Parser (StateMachines.StateMachine -> StateMachines.StateMachine)
-boundedCurly = do
+curly :: Parser (StateMachines.StateMachine -> StateMachines.StateMachine)
+curly = do
   Parsec.char '{'
   lowerCount <- nat
-  Parsec.char ','
-  upperCount <- nat
+  upper <- Parsec.optionMaybe $ Parsec.char ',' >> Parsec.optionMaybe nat
   Parsec.char '}'
-  return $ StateMachines.repeatBounded lowerCount upperCount
+  return $ case upper of
+             Nothing -> StateMachines.repeatFixed lowerCount
+             Just Nothing -> StateMachines.repeatAtLeast lowerCount
+             Just (Just upperCount) ->
+                 StateMachines.repeatBounded lowerCount upperCount
 
 nat :: Parser Int
 nat = read <$> Parsec.many1 Parsec.digit

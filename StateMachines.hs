@@ -54,9 +54,13 @@ addEpsilons states sources destinations =
 cat :: StateMachine -> StateMachine -> StateMachine
 cat (StateMachine states1 start1 final1) (StateMachine states2 start2 final2) =
     let delta = length states1
-        newStates = addEpsilons (combineStateLists states1 states2) final1 $
-                    offsetIndexSet delta start2 in
-    StateMachine newStates start1 $ offsetIndexSet delta final2
+        newStart2 = offsetIndexSet delta start2
+        newStates = addEpsilons (combineStateLists states1 states2)
+                    final1 newStart2 in
+    StateMachine newStates
+                 (if Set.null $ Set.intersection start1 final1 then start1
+                  else Set.union start1 newStart2)
+                 (offsetIndexSet delta final2)
 
 kleene :: StateMachine -> StateMachine
 kleene (StateMachine states start final) =
@@ -96,4 +100,4 @@ repeatBounded :: Int -> Int -> StateMachine -> StateMachine
 repeatBounded lowerCount upperCount machine =
     let addRepetition existing = optional $ cat machine existing in
     cat (repeatFixed lowerCount machine) $
-        iterate addRepetition empty !! upperCount
+        iterate addRepetition empty !! (upperCount - lowerCount)
