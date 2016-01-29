@@ -1,0 +1,20 @@
+name:                regex
+version:             0.1.0.0
+synopsis:            Regex matcher for Triplebyte project.
+author:              Taymon A. Beal
+maintainer:          taymonbeal@gmail.com
+category:            Text
+build-type:          Simple
+cabal-version:       >=1.10
+
+executable regex
+  main-is:             Main.hs
+  build-depends:       base >=4.7 && <4.8, parsec >=3.1 && <3.2, containers >=0.5 && <0.6
+  default-language:    Haskell2010
+
+test-suite regex-test
+  type:                exitcode-stdio-1.0
+  main-is:             Test.hs
+  other-extensions:    TemplateHaskell
+  build-depends:       base >=4.7 && <4.8, parsec >=3.1 && <3.2, containers >=0.5 && <0.6, QuickCheck >=2.7 && <2.8, control-monad-omega >=0.3 && <0.4
+  default-language:    Haskell2010
