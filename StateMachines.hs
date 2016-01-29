@@ -1,6 +1,7 @@
 module StateMachines
-    (StateMachine, empty, alt, cat, kleene, matches, anyChar, specificChar,
-     oneOrMore, optional, repeatFixed, repeatAtLeast, repeatBounded) where
+    (StateMachine(..), TransitionPredicate, empty, singleCharMatcher, alt, cat,
+     kleene, matches, anyChar, specificChar, oneOrMore, optional, repeatFixed,
+     repeatAtLeast, repeatBounded, Transition(..)) where
 
 import qualified Data.Set as Set
 
